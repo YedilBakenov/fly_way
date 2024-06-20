@@ -30,13 +30,12 @@ public class HomeController {
         return "sign-in";
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    @PostMapping(value = "/admin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping(value = "/admin")
     public String adminPage(){
         return "admin";
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_STUDENT') || isAnonymous()")
     @GetMapping(value = "/forbidden")
     public String forbidden(){
         return "forbidden";
@@ -45,8 +44,19 @@ public class HomeController {
     @PreAuthorize("isAnonymous()")
     @PostMapping(value = "/register")
     public String register(User user, @RequestParam String rePassword){
-        serviceUser.addUser(user, rePassword);
-        return "redirect:/sign-in";
+        String result =  serviceUser.addUser(user, rePassword);
+        return "redirect:/sign-in?" + result;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value = "/change-password")
+    public String changePass(@RequestParam String currentPass,
+                             @RequestParam String newPass,
+                             @RequestParam String reNewPass){
+
+        String result =  serviceUser.changePass(currentPass, newPass, reNewPass);
+        return "redirect:/" + result;
+
     }
 }
 

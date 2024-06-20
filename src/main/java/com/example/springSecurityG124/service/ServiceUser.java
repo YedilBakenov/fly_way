@@ -18,23 +18,22 @@ import java.util.List;
 public class ServiceUser {
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public User getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User)authentication.getPrincipal();
     }
 
-    public void addUser(User user, String rePassword) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    public String addUser(User user, String rePassword) {
         User user1 = userRepository.findByEmail(user.getEmail());
 
         if(user1 != null) {
-            return;
+            return "EmailNotValid";
         }
 
         if(!user.getPassword().equals(rePassword)){
-            return;
+            return "PasswordIncorrect";
         }
 
         user.setPassword(passwordEncoder.encode(rePassword));
@@ -45,5 +44,24 @@ public class ServiceUser {
 
         userRepository.save(user);
 
+        return "SuccessAddUser";
+
+    }
+
+
+    public String changePass(String currentPass, String newPass, String reNewPass) {
+        if(!passwordEncoder.matches(currentPass, getCurrentUser().getPassword())){
+            return "PasswordIncorrect";
+        }
+
+        if(!newPass.equals(reNewPass)){
+            return "PasswordIncorrect";
+        }
+
+        getCurrentUser().setPassword(passwordEncoder.encode(newPass));
+
+        userRepository.save(getCurrentUser());
+
+        return "Success";
     }
 }
