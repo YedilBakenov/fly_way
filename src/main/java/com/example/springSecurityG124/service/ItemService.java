@@ -1,6 +1,8 @@
 package com.example.springSecurityG124.service;
 
 
+import com.example.springSecurityG124.dto.ItemDTO;
+import com.example.springSecurityG124.mapper.ItemMapper;
 import com.example.springSecurityG124.model.Item;
 import com.example.springSecurityG124.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,31 +14,42 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemService {
     private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
 
-    public List<Item> getAllItems(){
-        return itemRepository.findAll();
+    public List<ItemDTO> getAllItems(){
+        return itemMapper.toListItemDTO(itemRepository.findAll());
     }
 
-    public Item addItem(Item item){
-        return itemRepository.save(item);
+    public ItemDTO addItem(ItemDTO item){
+        Item item1 = itemMapper.toItem(item);
+        ItemDTO itemDTO =  itemMapper.toItemDTO(item1);
+        itemRepository.save(item1);
+        return itemDTO;
     }
 
-    public Item updateItem(Item item) {
-        Item item1 = itemRepository.findById(item.getId()).orElse(null);
+    public ItemDTO updateItem(ItemDTO item) {
 
-        item1.setName(item.getName());
-        item1.setDescription(item.getDescription());
-        item1.setPrice(item.getPrice());
-        item1.getUpdatedAt();
-        return itemRepository.save(item1);
+        Item item2 = itemMapper.toItem(item);
+        item2.setId(item.getId());
+        item2.setName(item.getItemName());
+        item2.setUpdatedAt(item.getUpdatedAt());
+        item2.setDescription(item.getDescription());
+        item2.setPrice(item.getPrice());
+
+        ItemDTO itemDTO = itemMapper.toItemDTO(item2);
+
+        itemRepository.save(item2);
+
+        return itemDTO;
     }
 
-    public Item getById(int id) {
-        return itemRepository.findById(id).orElse(null);
+    public ItemDTO getById(int id) {
+        return itemMapper.toItemDTO(itemRepository.findById(id).orElse(null));
     }
 
-    public Item deleteItem(int id) {
-        Item item = getById(id);
+    public ItemDTO deleteItem(int id) {
+        ItemDTO item = getById(id);
+
         itemRepository.deleteById(id);
         return item;
     }
