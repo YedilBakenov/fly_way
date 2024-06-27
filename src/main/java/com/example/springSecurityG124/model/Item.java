@@ -21,7 +21,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "text")
     private String name;
 
     @Column(name = "description", columnDefinition = "text")
@@ -29,6 +29,9 @@ public class Item {
 
     @Column(name = "price")
     private int price;
+
+    @Column(name = "location")
+    private String location;
 
     private LocalDateTime createdAt;
 
